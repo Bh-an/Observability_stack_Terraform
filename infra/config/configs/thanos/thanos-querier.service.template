@@ -1,0 +1,19 @@
+[Unit]
+Description=Thanos Querier
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/thanos query \
+    --log.level=info \
+    --grpc-address=0.0.0.0:10901 \
+    --http-address=0.0.0.0:10902 \
+    --query.replica-label=replica \
+    --endpoint=__PROMETHEUS_LB_DNS_NAME__:10901 \
+    --endpoint=__STORE_GATEWAY_LB_DNS_NAME__:10901
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

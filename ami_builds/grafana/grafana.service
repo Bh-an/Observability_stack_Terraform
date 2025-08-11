@@ -1,0 +1,17 @@
+[Unit]
+Description=Grafana
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=grafana
+Group=grafana
+Type=simple
+ExecStart=/usr/sbin/grafana-server \
+    --config=/etc/grafana/grafana.ini \
+    cfg:default.paths.logs=/var/log/grafana \
+    cfg:default.paths.data=/var/lib/grafana \
+    cfg:default.paths.plugins=/var/lib/grafana/plugins
+
+[Install]
+WantedBy=multi-user.target
