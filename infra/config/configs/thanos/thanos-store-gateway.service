@@ -1,0 +1,19 @@
+[Unit]
+Description=Thanos Store Gateway
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/thanos store \
+    --log.level=info \
+    --data-dir=/var/lib/thanos-store \
+    --grpc-address=0.0.0.0:10901 \
+    --http-address=0.0.0.0:10902 \
+    --objstore.config="type: S3\nconfig:\n  bucket: \"__S3_BUCKET_NAME__\""
+
+Restart=always
+User=root # Or create a dedicated user
+
+[Install]
+WantedBy=multi-user.target

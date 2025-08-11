@@ -1,0 +1,28 @@
+# thanos-sidecar.service.template
+
+[Unit]
+Description=Thanos Sidecar
+Wants=network-online.target
+# This service will only start AFTER prometheus.service is active.
+After=prometheus.service
+# If prometheus.service stops or fails, this service will be stopped too.
+BindsTo=prometheus.service
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+
+# Using bash -c wrapper to ensure the complex S3 config string is parsed correctly.
+ExecStart=/bin/bash -c '/usr/local/bin/thanos sidecar \
+    --tsdb.path="/var/lib/prometheus/data" \
+    --prometheus.url="http://127.0.0.1:9090" \
+    --objstore.config="type: S3\nconfig:\n  bucket: \"__S3_BUCKET_NAME__\"\n  endpoint: \"s3.__AWS_REGION__.amazonaws.com\"" \
+    --log.level=info \
+    --shipper.upload-compacted'
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
